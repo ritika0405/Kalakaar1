@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <title>Kalakaar</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="container">
+      <div class="topic">Kala|kaar</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="categories.html">Categories</a></li>
+        <li><a href="login.html" id="header_login">Login</a></li>
+        <li><a href="" id="header_logout">Logout</a></li>
+        <li><a href="contact_us.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </header>
+  <section class="profile-section" id="profile">
+    <h1>See your bookings here!</h1>
+
+    <table class="table table-hover booking">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Artist</th>
+          <th scope="col">Category</th>
+          <th scope="col">Event</th>
+          <th scope="col">Date</th>
+          <th scope="col">Capacity</th>
+          <th scope="col">Details</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <!-- Modal -->
+    <div class="modal fade" id="modalCenter" tabindex="-1" role="dialog" aria-labelledby="modalCenterTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLongTitle" style="text-align: center;">Booking Details</h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-sm-6"><strong>Artist Name:</strong></div>
+              <div class="col-sm-6" id="modal_artist_name"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Full Name:</strong></div>
+              <div class="col-sm-6" id="modal_fullname"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Email:</strong></div>
+              <div class="col-sm-6" id="modal_email"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Category:</strong></div>
+              <div class="col-sm-6" id="modal_category"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Event:</strong></div>
+              <div class="col-sm-6" id="modal_event"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Venue:</strong></div>
+              <div class="col-sm-6" id="modal_venue"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Capacity:</strong></div>
+              <div class="col-sm-6" id="modal_capacity"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Budget:</strong></div>
+              <div class="col-sm-6" id="modal_budget"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Date:</strong></div>
+              <div class="col-sm-6" id="modal_date"></div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"><strong>Additional information:</strong></div>
+              <div class="col-sm-6" id="modal_additional_info"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const token = localStorage.getItem('token');
+      const userid = localStorage.getItem('userid');
+
+      fetch('http://localhost:5000/api/bookings/fetchbooking', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authtoken': token
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Function to populate table rows
+          const populateTable = () => {
+            const tableBody = document.getElementById('table-body');
+            let i = 1;
+            data.forEach(item => {
+              const row = document.createElement('tr');
+
+              const numberCell = document.createElement('th');
+              numberCell.textContent = i;
+              row.appendChild(numberCell);
+
+              const artistCell = document.createElement('td');
+              artistCell.textContent = item.artist_name;
+              row.appendChild(artistCell);
+
+              const categoryCell = document.createElement('td');
+              categoryCell.textContent = item.category;
+              row.appendChild(categoryCell);
+
+              const eventCell = document.createElement('td');
+              eventCell.textContent = item.event;
+              row.appendChild(eventCell);
+
+              const dateCell = document.createElement('td');
+              // Create a new Date object using the date string
+              let obj_date = new Date(item.date);
+              // Format the date as "dd mm yyyy"
+              var formattedDate = obj_date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+              });
+              dateCell.textContent = formattedDate;
+              row.appendChild(dateCell);
+
+              const capacityCell = document.createElement('td');
+              capacityCell.textContent = item.capacity;
+              row.appendChild(capacityCell);
+
+              const detailsCell = document.createElement('td');
+              const detailsButton = document.createElement('button');
+              detailsButton.classList.add("btn", "btn-primary");
+              // Add data-toggle and data-target attributes
+              detailsButton.dataset.toggle = "modal";
+              detailsButton.dataset.target = "#modalCenter";
+              detailsButton.textContent = "Details";
+
+              detailsButton.addEventListener('click', () => {
+                // Populate the modal with the data fields
+                const modal = document.querySelector('#modalCenter');
+                modal.querySelector('#modal_artist_name').textContent = item.artist_name;
+                modal.querySelector('#modal_fullname').textContent = item.fullname;
+                modal.querySelector('#modal_email').textContent = item.email;
+                modal.querySelector('#modal_category').textContent = item.category;
+                modal.querySelector('#modal_event').textContent = item.event;
+                modal.querySelector('#modal_venue').textContent = item.venue;
+                modal.querySelector('#modal_capacity').textContent = item.capacity;
+                modal.querySelector('#modal_budget').textContent = item.budget;
+                modal.querySelector('#modal_date').textContent = formattedDate;
+                modal.querySelector('#modal_additional_info').textContent = item.additional_info;
+              });
+
+              detailsCell.appendChild(detailsButton);
+              row.appendChild(detailsCell);
+
+              const deleteCell = document.createElement('td');
+              const deleteButton = document.createElement('button');
+              deleteButton.classList.add("btn", "btn-danger");
+              deleteButton.textContent = "Delete";
+              deleteButton.addEventListener('click', () => {
+                // Send a DELETE request to the server to delete the item
+                fetch(`http://localhost:5000/api/bookings/deletebooking/${item._id}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'authtoken': token
+                  },
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.success) {
+                      // Item deleted successfully, remove the row from the table
+                      row.remove();
+                    }
+                    else {
+                      // Handle error case
+                      console.error('Failed to delete item');
+                      alert('Failed to delete item');
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                    alert('Internal Server Error');
+                  });
+              });
+              deleteCell.appendChild(deleteButton);
+              row.appendChild(deleteCell);
+
+              tableBody.appendChild(row);
+              i++;
+            });
+          };
+          // Call the function to populate the table
+          populateTable();
+        });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginButton = document.getElementById('header_login');
+      const logoutButton = document.getElementById('header_logout');
+
+      // Check if token exists in localStorage
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        // Token exists, show logout button and hide login button
+        logoutButton.style.display = 'inline-block';
+        loginButton.style.display = 'none';
+      } else {
+        // Token does not exist, show login button and hide logout button
+        loginButton.style.display = 'inline-block';
+        logoutButton.style.display = 'none';
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const logoutButton = document.getElementById('header_logout');
+      logoutButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        localStorage.clear();
+        window.location.href = "login.html";
+      });
+    });
+  </script>
+</body>
+
+</html>

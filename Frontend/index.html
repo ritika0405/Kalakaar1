@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Kalakaar</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="container">
+            <div class="topic">Kala|kaar</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="login.html" id="header_login">Login</a></li>
+                <li><a href="" id="header_logout">Logout</a></li>
+                <li><a href="contact_us.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="home-section" id="home">
+        <div class="container">
+            <h1>Search for an artist for your event!</h1>
+            <form action="" method="post">
+                <select name="category" id="category" class="ddcategory">
+                    <option value="undefined">Select a category</option>
+                    <option value="singer">Singer</option>
+                    <option value="dancer">Dancer</option>
+                    <option value="comedian">Comedian</option>
+                    <option value="Anchor">Anchor</option>
+                    <option value="band">Band</option>
+                    <option value="rapper">Rapper</option>
+                    <option value="instrumentalist">Instrumentalist</option>
+                    <option value="anchor">Anchor</option>
+                </select>
+                <button class="search" id="searchbutton">Search</button>
+            </form>
+        </div>
+
+        <script>
+            const searchButton = document.getElementById('searchbutton');
+            searchButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                const category = document.getElementById('category').value;
+                if (category !== "undefined") {
+                    window.location.href = `${category}.html`;
+                }
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loginButton = document.getElementById('header_login');
+                const logoutButton = document.getElementById('header_logout');
+
+                // Check if token exists in localStorage
+                const token = localStorage.getItem('token');
+
+                if (token) {
+                    // Token exists, show logout button and hide login button
+                    logoutButton.style.display = 'inline-block';
+                    loginButton.style.display = 'none';
+                } else {
+                    // Token does not exist, show login button and hide logout button
+                    loginButton.style.display = 'inline-block';
+                    logoutButton.style.display = 'none';
+                }
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const logoutButton = document.getElementById('header_logout');
+                logoutButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                });
+            });
+        </script>
+</body>
+
+</html>

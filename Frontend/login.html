@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="script/jwt_decode.js"></script>
+  <title> Login Page</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+    }
+
+    .form {
+      display: none;
+    }
+
+    .form.active {
+      display: block;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginButton = document.getElementById('loginButton');
+      const signupButton = document.getElementById('signupButton');
+      const loginForm = document.getElementById('login');
+      const signupForm = document.getElementById('signup');
+
+      loginButton.addEventListener('click', function () {
+        loginButton.classList.add('active');
+        signupButton.classList.remove('active');
+        loginForm.classList.add('active');
+        signupForm.classList.remove('active');
+      });
+
+      signupButton.addEventListener('click', function () {
+        loginButton.classList.remove('active');
+        signupButton.classList.add('active');
+        loginForm.classList.remove('active');
+        signupForm.classList.add('active');
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <header>
+    <nav class="container">
+      <div class="topic">Kala|kaar</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="categories.html">Categories</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="contact_us.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </header>
+  <section class="login-signup">
+
+    <section class="login-section">
+      <div class="form active" id="login">
+        <h1>Login</h1><br>
+        <form id="login-form">
+          <input type="email" id="email" class="form-control" placeholder="Email" /><br>
+          <input type="password" minlength="8" id="password" class="form-control" placeholder="Password" /><br><br><br>
+          <button type="submit" class="btn btn-primary">Login</button><br><br>
+          Don't have an account? <a class="btn-btn-link" id="signupButton">Sign up here!</a><br>
+        </form>
+    </section>
+
+    <section class="signup-section">
+      <div class="form" id="signup">
+        <h1>Signup</h1>
+        <form id="signup-form">
+          <input type="text" id="fullname" class="form-control" placeholder="Full Name" /><br>
+          <input type="email" id="newemail" class="form-control" placeholder="Email" /><br>
+          <input type="password" minlength="8" id="newpassword" class="form-control"
+            placeholder="Password" /><br><br><br>
+          <button type="submit" class="btn btn-primary">Signup</button><br><br>
+          Already have an account? <a class="btn-btn-link" id="loginButton">Login here!</a><br>
+        </form>
+      </div>
+    </section>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('login-form');
+
+      loginForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Assuming the login response includes a 'authtoken' property
+              const token = data.authtoken;
+
+              // Decode the JWT token by the secret key to extract the payload data
+              // const decodedToken = jwt.verify(token, 'Th!s1s@v3ryC0mpl3xK3yForT0ken');
+              const decodedToken = jwt_decode(token);
+
+              // Extract the necessary information from the decoded token
+              const fullname = decodedToken.fullname;
+              const email = decodedToken.email;
+              const userid = decodedToken.userid;
+
+              // Save the extracted data in localStorage
+              localStorage.setItem("fullname", fullname);
+              localStorage.setItem("email", email);
+              localStorage.setItem("token", token);
+              localStorage.setItem("userid", userid);
+              console.log('Credentials imported');
+
+              // Redirect to another page
+              window.location.href = 'index.html';
+            }
+            else {
+              console.log('Login failed. Please try again.');
+              alert(data.error);
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            console.log('An error occurred during login. Please try again.');
+            alert('Internal Server Error');
+          });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('signup-form');
+
+      loginForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const fullname = document.getElementById('fullname').value;
+        const email = document.getElementById('newemail').value;
+        const password = document.getElementById('newpassword').value;
+
+        fetch('http://localhost:5000/api/auth/createuser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fullname, email, password })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const loginButton = document.getElementById('loginButton');
+              loginButton.click();
+              setTimeout(() => {
+                alert(" You're signed Up Successfully. Login now!");
+              }, 100);
+            } else {
+              console.log('Sign Up failed. Please try again.');
+              alert(data.error);
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            console.log('An error occurred during signup. Please try again.');
+            alert('Internal Server Error');
+          });
+      });
+    });
+  </script>
+
+</body>
+
+</html>

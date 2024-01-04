@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Artist Booking Page</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="container">
+            <div class="topic">Kala|kaar</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="login.html" id="header_login">Login</a></li>
+                <li><a href="" id="header_logout">Logout</a></li>
+                <li><a href="contact_us.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="singers-section" id="singer">
+        <h1>Book your favourite singer now!</h1>
+        <div class="row">
+            <div class="card col-md-3">
+                <img src="img/singer1.jpg" alt="singer1" style="width: 100%;">
+                <h2>Singer1</h2>
+                <a href="#" class="btn btn-primary book-now-button">Book Now</a>
+            </div>
+            <div class="card col-md-3">
+                <img src="img/singer2.jpg" alt="singer2" style="width: 100%;">
+                <h2>Singer2</h2>
+                <a href="#" class="btn btn-primary book-now-button">Book Now</a>
+            </div>
+            <div class="card col-md-3">
+                <img src="img/singer3.jpg" alt="singer3" style="width: 100%;">
+                <h2>Singer3</h2>
+                <a href="#" class="btn btn-primary book-now-button">Book Now</a>
+            </div>
+            <div class="card col-md-3">
+                <img src="img/singer4.jpg" alt="singer4" style="width: 100%;">
+                <h2>Singer4</h2>
+                <a href="#" class="btn btn-primary book-now-button">Book Now</a>
+            </div>
+    </section>
+
+    <script>
+        const bookNowButtons = document.querySelectorAll('.book-now-button');
+        bookNowButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                if (!localStorage.getItem('token')) {
+                    window.location.href = "login.html";
+                }
+                else {
+                    const artist_name = event.target.closest('.card').querySelector('h2').textContent;
+                    localStorage.setItem('artist_name', artist_name);
+                    window.location.href = "contact_us.html";
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginButton = document.getElementById('header_login');
+            const logoutButton = document.getElementById('header_logout');
+
+            // Check if token exists in localStorage
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                // Token exists, show logout button and hide login button
+                logoutButton.style.display = 'inline-block';
+                loginButton.style.display = 'none';
+            } else {
+                // Token does not exist, show login button and hide logout button
+                loginButton.style.display = 'inline-block';
+                logoutButton.style.display = 'none';
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutButton = document.getElementById('header_logout');
+            logoutButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                localStorage.clear();
+                window.location.href = "login.html";
+            });
+        });
+    </script>
+</body>
+
+</html>
